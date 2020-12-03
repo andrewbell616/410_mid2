@@ -6,18 +6,23 @@
 
 #include <iostream>
 #include <thread>
+#include <mutex>
+#include <atomic>
+
 using namespace std;
 
 const int ONE_MINUTE=60000;
 const int START_VALUE = 10000000;
 
-int isource = START_VALUE;
-int idest =0;
+atomic<int> isource{START_VALUE};
+atomic<int> idest{0};
 
 //global to control threads
 bool bDoWork=true;
+mutex mtx;
 
 void report(int id, string s) {
+	lock_guard<mutex> lck(mtx);
 	cout << "Thread " << id << ":" << s << endl;
 }
 
@@ -33,6 +38,7 @@ void transfer(int id, int numbtimestotransfer){
 		}
 
 		//take from isource and add to idest
+		//atomics
 		isource--;
 		idest++;
 
